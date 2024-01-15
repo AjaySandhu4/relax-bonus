@@ -8,7 +8,11 @@ Node = namedtuple("Node", ["value", "children"])
 
 
 def main():
-    
+    with open('relations.txt') as relation_file:
+        raw_relations = relation_file.read()
+        print(lexers.lexing_relations(raw_relations))
+        # print(raw_relations)
+
     tests = [
         '(Courses) × (takes)',
         'π name, title, mark (Student)',
@@ -20,8 +24,8 @@ def main():
         '((Courses) × (takes))'
     ]
     print()
-    for test in tests:
-        print(test, '->', lexers.lexing_query(test))
+    # for test in tests:
+    #     print(test, '->', lexers.lexing_query(test))
 
 
 

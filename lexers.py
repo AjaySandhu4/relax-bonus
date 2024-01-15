@@ -1,7 +1,7 @@
 from pyparsing import *
 from globals import *
 
-def lexing_query(rawQuery: str):
+def lexing_query(raw_query: str):
     try:
         ppc = pyparsing_common
         bin_op = (
@@ -45,7 +45,7 @@ def lexing_query(rawQuery: str):
         )
 
         expr.setParseAction(putOperatorFirst)
-        parsedQuery = expr.parseString(rawQuery)
+        parsedQuery = expr.parseString(raw_query)
         # print(type(parsedQuery) == str)
         # return parsedQuery if type(parsedQuery) == str else parsedQuery[0]
         return parsedQuery
@@ -55,9 +55,21 @@ def lexing_query(rawQuery: str):
 
 
 
-# Altering parsed array to be in format: [<operator>, <optional: condition>, <expression>, <if second expr required: expression>]
+# Altering parsed array to be in format: [<operator>, <optional: condition>, <expression>, <if second expression required: expression>]
 def putOperatorFirst(tokens):
     if((type(tokens[0]) != str) and ((type(tokens[0][0]) != str) or (tokens[0][0] not in UNARY_OPERATORS))):
         tokens[0][0], tokens[0][1] = tokens[0][1], tokens[0][0]
         if(len(tokens[0]) == 4):
             tokens[0][1], tokens[0][2] = tokens[0][2], tokens[0][1]
+
+def lexing_relations(raw_relations: str):
+    try:
+        relation_name = Word(alphas)
+        element = Word(alphanums + '\'@.')
+        row = Group(delimitedList(element, delim=','))
+        relation = relation_name + Literal('=').suppress() + Literal('{').suppress() + Group(OneOrMore(row)) + Literal('}').suppress()
+        relations = OneOrMore(Group(relation))
+        return relations.parseString(raw_relations)
+    except:
+        print("Error in relation lexer")
+        exit()
