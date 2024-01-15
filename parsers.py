@@ -1,9 +1,10 @@
 from pyparsing import *
 from globals import *
+from classes import *
+from pprint import pprint
 
-def lexing_query(raw_query: str):
+def parse_query(raw_query: str):
     try:
-        ppc = pyparsing_common
         bin_op = (
             Literal(OPERATORS['select']) 
             | Literal(OPERATORS['cross_product']) 
@@ -25,9 +26,12 @@ def lexing_query(raw_query: str):
         join_op = (inner_join_op) # add rest
 
         expr = Forward()
-        join_condition = Group(Word(alphas+'.')+Suppress('=')+Word(alphas+'.'))
+        relation_column = Group(Word(alphas) + Literal('.').suppress() + Word(alphas))
+        join_condition = Group(relation_column+Suppress('=')+relation_column)
         project_condition = Group(OneOrMore(Word(alphas)+Optional(Suppress(','))))
-        select_condition = Group(Word(alphas+'.')+oneOf("= > < <= >=")+Word(alphas+'.'))
+        select_condition_rhs = pyparsing_common.real | Word(alphanums)
+        select_condition_rhs.setParseAction(parse_numbers)
+        select_condition = Group(Word(alphas+'.')+oneOf("= > < <= >=")+select_condition_rhs)
         # bin_op = (cross_product_op | inner_join_op | intersection_op | union_op | minus_op)
         # expr <<= (
         #     (LPAR+relationName+RPAR)
@@ -65,11 +69,33 @@ def putOperatorFirst(tokens):
 def lexing_relations(raw_relations: str):
     try:
         relation_name = Word(alphas)
-        element = Word(alphanums + '\'@.')
+        column_name = Word(alphanums)
+        number_element = pyparsing_common.real
+        string_element = Optional(Literal('\'')).suppress() + Word(alphanums + '@.') + Optional(Literal('\'')).suppress()
+        element = number_element| column_name | string_element
+        element.setParseAction(parse_numbers)
+        # element.setParseAction(parse_numbers)
+        # element = QuotedString(quoteChar='\'').addParseAction(removeQuotes) | Word(alphanums)
         row = Group(delimitedList(element, delim=','))
         relation = relation_name + Literal('=').suppress() + Literal('{').suppress() + Group(OneOrMore(row)) + Literal('}').suppress()
         relations = OneOrMore(Group(relation))
-        return relations.parseString(raw_relations)
+        return relations.parseString(raw_relations).asList()
     except:
         print("Error in relation lexer")
         exit()
+
+def parse_relations(relation_tokens):
+    relation_dict = {}
+    for relation_token in relation_tokens:
+        relation_name = relation_token[0]
+        relation_data = relation_token[1]
+        relation_dict[relation_name] = Relation(relation_name, relation_data)
+        # pprint(relation_dict[relation_name])
+    return relation_dict
+        
+def parse_numbers(tokens):
+    try:
+        tokens[0] = float(tokens[0])
+    except:
+        return
+

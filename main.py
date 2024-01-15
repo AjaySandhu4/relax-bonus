@@ -1,18 +1,18 @@
 from globals import *
-import lexers
+from parsers import *
 import sys
-from collections import namedtuple
+from pprint import pprint
 
 sys.setrecursionlimit(3000)
-Node = namedtuple("Node", ["value", "children"])
-
 
 def main():
     with open('relations.txt') as relation_file:
         raw_relations = relation_file.read()
-        print(lexers.lexing_relations(raw_relations))
-        # print(raw_relations)
-
+        relation_tokens = lexing_relations(raw_relations)
+        # pprint(relation_tokens)
+        relations_dict = parse_relations(relation_tokens)
+        # pprint(relations_dict['Student'].name)
+    
     tests = [
         '(Courses) × (takes)',
         'π name, title, mark (Student)',
@@ -21,16 +21,20 @@ def main():
         '((Courses) × (((takes) × (Student)) × (Student))) ⨝ cid=Course.id (Course)',
         'Courses',
         '(Courses)',
-        '((Courses) × (takes))'
+        '((Courses) × (takes))',
+        'σ Student.mark>4 (Student)'
     ]
-    print()
+    
+    query = parse_query(tests[8])
+    print(query)
+
+    # perform()
     # for test in tests:
-    #     print(test, '->', lexers.lexing_query(test))
+    #     print(test, '->', parse_query(test))
+    
 
-
-
-def buildSyntaxTree():
-    print("YESSIR")
+def perform(operator = None, left_arg = None, right_arg = None, condition = None):
+    print(5)
 
     
 
