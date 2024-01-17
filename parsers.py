@@ -29,9 +29,9 @@ def parse_query(raw_query: str):
         relation_column = Group(Word(alphas) + Literal('.').suppress() + Word(alphas))
         join_condition = Group(relation_column+Suppress('=')+relation_column)
         project_condition = Group(OneOrMore(Word(alphas)+Optional(Suppress(','))))
-        select_condition_rhs = pyparsing_common.real | Word(alphanums)
+        select_condition_rhs = pyparsing_common.real | Literal('\'').suppress() + Word(alphanums) + Literal('\'').suppress()
         select_condition_rhs.setParseAction(parse_numbers)
-        select_condition = Group(Word(alphas+'.')+oneOf("= > < <= >=")+select_condition_rhs)
+        select_condition = Group(Optional(Word(alphas)+Literal('.')).suppress()+Word(alphas)+oneOf("= > < <= >=")+select_condition_rhs)
         # bin_op = (cross_product_op | inner_join_op | intersection_op | union_op | minus_op)
         # expr <<= (
         #     (LPAR+relationName+RPAR)
@@ -49,7 +49,7 @@ def parse_query(raw_query: str):
         )
 
         expr.setParseAction(putOperatorFirst)
-        parsedQuery = expr.parseString(raw_query)
+        parsedQuery = expr.parseString(raw_query).asList()
         # print(type(parsedQuery) == str)
         # return parsedQuery if type(parsedQuery) == str else parsedQuery[0]
         return parsedQuery

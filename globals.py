@@ -1,3 +1,5 @@
+from operations import *
+
 OPERATORS = {
     'select': 'σ',
     'project': 'π',
@@ -8,3 +10,13 @@ OPERATORS = {
     'minus': '-'
 }
 UNARY_OPERATORS = OPERATORS['select']+OPERATORS['project']
+
+RELATION_OPS_FUNCTIONS = {
+    'σ': select,
+    # 'π': project,
+    # '⨝': ,
+    # '×',
+    # '∩',
+    # '∪',
+    # '-'
+}
