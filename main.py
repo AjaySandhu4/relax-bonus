@@ -27,11 +27,14 @@ def main():
         'Courses',
         '(Courses)',
         '((Courses) × (takes))',
-        'σ Student.name=\'John\' (Student)'
-        'σ Student.id=2 (Student)'
+        'σ Student.name=\'John\' (Student)',
+        'σ Student.id=2 (Student)',
+        'π id, email (Student)',
+        'π email (Student)',
+        'π name, id, email (Student)',
     ]
     
-    query = parse_query(tests[8])
+    query = parse_query(tests[12])
     result = perform(query)
     if(isinstance(result, Relation)):
         result.print()

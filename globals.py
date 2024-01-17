@@ -13,9 +13,9 @@ UNARY_OPERATORS = OPERATORS['select']+OPERATORS['project']
 
 RELATION_OPS_FUNCTIONS = {
     'σ': select,
-    # 'π': project,
+    'π': project,
     # '⨝': ,
-    # '×',
+    '×': cross_product,
     # '∩',
     # '∪',
     # '-'
