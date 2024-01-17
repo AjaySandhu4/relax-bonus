@@ -16,7 +16,7 @@ RELATION_OPS_FUNCTIONS = {
     'π': project,
     # '⨝': ,
     '×': cross_product,
-    # '∩',
-    # '∪',
-    # '-'
+    '∩': intersection,
+    '∪': union,
+    '-': minus
 }

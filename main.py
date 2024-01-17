@@ -19,7 +19,7 @@ def main():
     # pprint(relations_dict)
     
     tests = [
-        '(Courses) × (takes)',
+        '(Course) × (takes)',
         'π name, title, mark (Student)',
         '(Student) ⨝ id=sid (takes)',
         '(π name, title, mark ((Student) ⨝ Student.id=Takes.sid (takes))) ⨝ cid=Course.id (Course)',
@@ -32,12 +32,18 @@ def main():
         'π id, email (Student)',
         'π email (Student)',
         'π name, id, email (Student)',
+        '(Course) ∩ (takes)',
+        '(takes) ∩ (takesTwo)',
+        '(takes) ∪ (takesTwo)',
+        '(takes) - (takesTwo)'
     ]
     
-    query = parse_query(tests[12])
+    query = parse_query(tests[16])
+    # print(relations_dict)
     result = perform(query)
     if(isinstance(result, Relation)):
         result.print()
+
     # pprint(query)
 
     # perform()
@@ -45,12 +51,13 @@ def main():
     #     print(test, '->', parse_query(test))
     
 
-# def perform(operator = None, left_arg = None, right_arg = None, condition = None):
-#     print(5)
 def perform(query):
     # try:
         if(type(query) == str):
-            return deepcopy(relations_dict[query]) if query in relations_dict else None
+            if query in relations_dict:
+                return deepcopy(relations_dict[query])
+            print('Failed to find relation', query)
+            exit()
         elif(len(query) == 1):
             return perform(query[0])
         elif(len(query) == 3):

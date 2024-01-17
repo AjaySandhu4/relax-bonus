@@ -20,3 +20,21 @@ sid, cname
 2, 'Network'
 3, 'Math'
 }
+
+takesTwo = {
+sid, cname
+1, 'Math'
+2, 'Pythics'
+1, 'Network'
+2, 'Network'
+4, 'Math'
+}
+
+takesThree = {
+sid, cname, dinos
+1, 'Math', 5
+2, 'Pythics', 6
+1, 'Network', 6
+2, 'Network',4 
+4, 'Math',4
+}

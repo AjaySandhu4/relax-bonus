@@ -88,8 +88,9 @@ def parse_relations(relation_tokens):
     relation_dict = {}
     for relation_token in relation_tokens:
         relation_name = relation_token[0]
-        relation_data = relation_token[1]
-        relation_dict[relation_name] = Relation(relation_name, relation_data)
+        relation_columns = relation_token[1][0]
+        relation_rows = relation_token[1][1:]
+        relation_dict[relation_name] = Relation(relation_name, relation_columns, relation_rows)
         # pprint(relation_dict[relation_name])
     return relation_dict
         
