@@ -11,10 +11,12 @@ The system supports the following operations:
     Intersection (∩)
     Union (∪)
     Minus (-)
-    Natural and Inner Join (⨝)
+    Inner Join (⨝)
     Left Outer Join (⟕)
     Right Outer Join (⟖)
     Full Outer Join (⟗)
+
+Note: Inner Join (⨝) supports natural, equi, and theta join
 
 Examples of possible queries:
     (Course) × (takes)
@@ -30,3 +32,4 @@ Examples of possible queries:
     σ name='John' ((Student) ⟗ name=name (CourseTwo))
     (Student) ⟕ name=name (CourseTwo)
     (Course) ⟖ name=name (π name, email (Student))
+    (Student) ⨝ id<sid (takes)
