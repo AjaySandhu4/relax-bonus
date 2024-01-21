@@ -15,6 +15,7 @@ OPERATORS = {
 }
 UNARY_OPERATORS = OPERATORS['select']+OPERATORS['project']
 
+# Parses query by defining a context-free grammar representing the relational algebra language
 def parse_query(raw_query: str):
     try:
         bin_op = (
@@ -44,6 +45,7 @@ def parse_query(raw_query: str):
         select_condition_rhs.setParseAction(parse_numbers)
         select_condition = Group(Word(alphas)+oneOf('= > < <= >=')+select_condition_rhs)
 
+        # The context-free grammar
         expr <<= (
             Group(project_op + project_condition + LPAR+expr+RPAR)
             | Group(select_op + select_condition + LPAR+expr+RPAR)
@@ -87,7 +89,7 @@ def lexing_relations(raw_relations: str):
         print('Error in relation lexer')
         exit()
 
-def parse_relations(relation_tokens):
+def parse_relation_tokens(relation_tokens):
     relation_dict = {}
     for relation_token in relation_tokens:
         relation_name = relation_token[0]

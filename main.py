@@ -14,7 +14,7 @@ def main():
         raw_relations = relation_file.read()
         relation_tokens = lexing_relations(raw_relations)
         global relations_dict 
-        relations_dict = parse_relations(relation_tokens)
+        relations_dict = parse_relation_tokens(relation_tokens)
     
     while(True):
         print('Enter a relational algebra query (or enter \'q\' to quit):')
@@ -32,7 +32,7 @@ def main():
         except:
             print('Query failed')
             
-
+# Recursively performs query
 def perform(query):
     try:
         if(type(query) == str):
