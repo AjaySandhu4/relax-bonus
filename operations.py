@@ -18,10 +18,22 @@ def select(relation: Relation, condition: [str, str, str or int]) -> Relation:
         filter_by = condition[0]
         comparator = COMPARISON_OPS[condition[1]]
         rhs_operand = condition[2]
+        compare_columns = (rhs_operand in relation_copy.columns)
         column_index = relation_copy.columns.index(filter_by)
+        if compare_columns:
+            # Check if there are at least 2 columns with same name if comparing columns of same name
+            if (filter_by == rhs_operand):
+                if relation_copy.columns.count(filter_by) >= 2:
+                    comparison_column_index = relation_copy.columns.index(rhs_operand, column_index+1)
+                else:
+                    return relation_copy
+            else:
+                comparison_column_index = relation_copy.columns.index(rhs_operand)
         new_rows = []
         for row in relation_copy.rows:
-            if(comparator(row[column_index], rhs_operand)):
+            if compare_columns and comparator(row[column_index], row[comparison_column_index]):
+                new_rows.append(row)
+            elif((not compare_columns) and comparator(row[column_index], rhs_operand)):
                 new_rows.append(row)
         relation_copy.rows = new_rows
         return relation_copy
@@ -124,6 +136,57 @@ def minus(left_relation: Relation, right_relation: Relation) -> Relation:
         print('Failed to do minus operation')
         exit()
 
+def inner_join(left_relation: Relation, right_relation: Relation, condition: list = None) -> Relation:
+    if(condition == None):
+        return natural_join(left_relation, right_relation)
+    else:
+        relation_cross_product = cross_product(left_relation, right_relation)
+        # print('relation after cross product:')
+        relation_cross_product.print()
+        selected_cross_product = select(relation_cross_product, condition)
+        # print('relation after select with condition', condition)
+        selected_cross_product.print()
+        return selected_cross_product
+
+def natural_join(left_relation: Relation, right_relation: Relation) -> Relation:
+    print("In natural join")
+    try:
+        common_column = None
+        for left_column in left_relation.columns:
+            if left_column in right_relation.columns:
+                common_column = left_column
+        if common_column == None:
+            return cross_product(left_relation, right_relation) # Return cross product if no common column between relations
+        print(common_column)
+        joined_relations = inner_join(left_relation, right_relation, [common_column, '=', common_column])
+        right_relation_columns = deepcopy(right_relation.columns)
+        left_relation_columns = deepcopy(left_relation.columns)
+        right_relation_columns.remove(common_column)
+        joined_relations_with_no_duplicate_columns = project(joined_relations, left_relation_columns+right_relation_columns)
+        return joined_relations_with_no_duplicate_columns
+    except:
+        print('Failed to do the natural join operation')
+        exit()
+
+def left_outer_join(left_relation: Relation, right_relation: Relation, condition: list) -> Relation:
+    print('in left outer join')
+    inner_joined_relation = inner_join(left_relation, right_relation, condition)
+    inner_joined_relation.rows += unmatching_left_relation_rows(left_relation,right_relation,condition)
+    return inner_joined_relation
+    
+def right_outer_join(left_relation: Relation, right_relation: Relation, condition: list) -> Relation:
+    print('in right outer join')
+    inner_joined_relation = inner_join(left_relation, right_relation, condition)
+    inner_joined_relation.rows += unmatching_right_relation_rows(left_relation,right_relation,condition)
+    return inner_joined_relation
+
+def full_outer_join(left_relation: Relation, right_relation: Relation, condition: list) -> Relation:
+    print('in full outer join')
+    inner_joined_relation = inner_join(left_relation, right_relation, condition)
+    inner_joined_relation.rows += unmatching_left_relation_rows(left_relation,right_relation,condition)
+    inner_joined_relation.rows += unmatching_right_relation_rows(left_relation,right_relation,condition)
+    return inner_joined_relation
+
 def relations_unifiable(left_relation: Relation, right_relation: Relation) -> bool:
     if(len(left_relation.columns) != len(left_relation.columns)):
         return False
@@ -148,6 +211,23 @@ def row_in_relation(row: list, relation: Relation):
         if rows_match(row,relation_row):
             return True
     return False
+
+def compare(left, right, comparator):
+    if left == None or right == None:
+        return False
+    return comparator(left,right)
+
+def unmatching_left_relation_rows(left_relation: Relation, right_relation: Relation, condition: list) -> list:
+    filter_by = condition[0]
+    comparator = COMPARISON_OPS[condition[1]]
+    rhs_operand = condition[2]
+    left_relation_copy = deepcopy(left_relation)
+    for row in left_relation_copy.rows:
+        print("Yeah")
+    return []
+
+def unmatching_right_relation_rows(left_relation: Relation, right_relation: Relation, condition: list) -> list:
+    return []
 
 
 

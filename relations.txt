@@ -12,6 +12,15 @@ name, hours
 'Network', 3
 }
 
+CourseTwo = {
+name, hours
+'Math', 3
+'Pythics', 2
+'Network', 3
+'Alex', 4
+'John',7
+}
+
 takes = {
 sid, cname
 1, 'Math'

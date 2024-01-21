@@ -20,26 +20,30 @@ def main():
     
     tests = [
         '(Course) × (takes)',
-        'π name, title, mark (Student)',
+        'π name (Student)',
+        '(takes) ⨝ cname=name (Course)',
         '(Student) ⨝ id=sid (takes)',
-        '(π name, title, mark ((Student) ⨝ Student.id=Takes.sid (takes))) ⨝ cid=Course.id (Course)',
-        '((Courses) × (((takes) × (Student)) × (Student))) ⨝ cid=Course.id (Course)',
+        '(π name, title, mark ((Student) ⨝ id=sid (takes))) ⨝ sid=id (Course)',
+        '((Course) × (((takes) × (Student)) × (Student))) ⨝ sid=id (Course)',
         'Courses',
         '(Courses)',
         '((Courses) × (takes))',
-        'σ Student.name=\'John\' (Student)',
-        'σ Student.id=2 (Student)',
+        'σ name=\'John\' (Student)',
+        'σ id=2 (Student)',
         'π id, email (Student)',
         'π email (Student)',
         'π name, id, email (Student)',
         '(Course) ∩ (takes)',
         '(takes) ∩ (takesTwo)',
         '(takes) ∪ (takesTwo)',
-        '(takes) - (takesTwo)'
+        '(takes) - (takesTwo)',
+        '(Student) ⨝ (CourseTwo)'
     ]
-    
-    query = parse_query(tests[16])
-    # print(relations_dict)
+    test = tests[len(tests)-1]
+    pprint(len(tests[len(tests)-1]))
+    pprint(test)
+    query = parse_query(test)
+    print(relations_dict)
     result = perform(query)
     if(isinstance(result, Relation)):
         result.print()
@@ -73,8 +77,8 @@ def perform(query):
         elif(len(query) == 4):
             op = query[0]
             condition = query[1]
-            left_relation = perform(query[3]) #check query[1] or query[2] can possibly be relation?
-            right_relation = perform(query[4])
+            left_relation = perform(query[2]) #check query[1] or query[2] can possibly be relation?
+            right_relation = perform(query[3])
             return RELATION_OPS_FUNCTIONS[op](left_relation, right_relation, condition)
         else:
             return None

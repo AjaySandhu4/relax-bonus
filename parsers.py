@@ -4,7 +4,7 @@ from classes import *
 from pprint import pprint
 
 def parse_query(raw_query: str):
-    try:
+    # try:
         bin_op = (
             Literal(OPERATORS['select']) 
             | Literal(OPERATORS['cross_product']) 
@@ -16,28 +16,23 @@ def parse_query(raw_query: str):
         relationName = Word(alphas)
         select_op = Literal(OPERATORS['select'])
         project_op = Literal(OPERATORS['project'])
-        # cross_product_op = Literal(OPERATORS['cross_product'])
-        inner_join_op = Literal(OPERATORS['inner_join'])
-        # intersection_op = Literal(OPERATORS['intersection'])
-        # union_op = Literal(OPERATORS['union'])
-        # minus_op = Literal(OPERATORS['minus'])
         LPAR = Literal("(").suppress()
         RPAR = Literal(")").suppress()
-        join_op = (inner_join_op) # add rest
-
+        join_op = (
+            Literal(OPERATORS['inner_join'])
+            | Literal(OPERATORS['left_outer_join'])
+            | Literal(OPERATORS['right_outer_join'])
+            | Literal(OPERATORS['full_outer_join'])
+        )
         expr = Forward()
-        relation_column = Group(Word(alphas) + Literal('.').suppress() + Word(alphas))
-        join_condition = Group(relation_column+Suppress('=')+relation_column)
+        relation_column = Word(alphas)
+        join_condition = Group(relation_column+oneOf("= > < <= >=")+relation_column)
         project_condition = Group(OneOrMore(Word(alphas)+Optional(Suppress(','))))
-        select_condition_rhs = pyparsing_common.real | Literal('\'').suppress() + Word(alphanums) + Literal('\'').suppress()
+        select_condition_rhs = Word(nums) | Combine(Word(nums) + '.' + Word(nums)) | Literal('\'').suppress() + Word(alphas) + Literal('\'').suppress()
         select_condition_rhs.setParseAction(parse_numbers)
-        select_condition = Group(Optional(Word(alphas)+Literal('.')).suppress()+Word(alphas)+oneOf("= > < <= >=")+select_condition_rhs)
-        # bin_op = (cross_product_op | inner_join_op | intersection_op | union_op | minus_op)
-        # expr <<= (
-        #     (LPAR+relationName+RPAR)
-        #     | (LPAR+expr+RPAR + bin_op + LPAR+expr+RPAR) 
-        #     | (project_op + project_condition + LPAR+expr+RPAR)
-        # )
+        # select_condition_rhs.setParseAction(parse_condition)
+        select_condition = Group(Word(alphas)+oneOf("= > < <= >=")+select_condition_rhs)
+
         expr <<= (
             Group(project_op + project_condition + LPAR+expr+RPAR)
             | Group(select_op + select_condition + LPAR+expr+RPAR)
@@ -50,12 +45,11 @@ def parse_query(raw_query: str):
 
         expr.setParseAction(putOperatorFirst)
         parsedQuery = expr.parseString(raw_query).asList()
-        # print(type(parsedQuery) == str)
-        # return parsedQuery if type(parsedQuery) == str else parsedQuery[0]
+        pprint(parsedQuery)
         return parsedQuery
-    except:
-        print("Error in query lexer")
-        return None
+    # except:
+    #     print("Error in query lexer")
+    #     return None
 
 
 
@@ -65,6 +59,7 @@ def putOperatorFirst(tokens):
         tokens[0][0], tokens[0][1] = tokens[0][1], tokens[0][0]
         if(len(tokens[0]) == 4):
             tokens[0][1], tokens[0][2] = tokens[0][2], tokens[0][1]
+    return tokens
 
 def lexing_relations(raw_relations: str):
     try:
@@ -74,8 +69,6 @@ def lexing_relations(raw_relations: str):
         string_element = Optional(Literal('\'')).suppress() + Word(alphanums + '@.') + Optional(Literal('\'')).suppress()
         element = number_element| column_name | string_element
         element.setParseAction(parse_numbers)
-        # element.setParseAction(parse_numbers)
-        # element = QuotedString(quoteChar='\'').addParseAction(removeQuotes) | Word(alphanums)
         row = Group(delimitedList(element, delim=','))
         relation = relation_name + Literal('=').suppress() + Literal('{').suppress() + Group(OneOrMore(row)) + Literal('}').suppress()
         relations = OneOrMore(Group(relation))
@@ -91,12 +84,22 @@ def parse_relations(relation_tokens):
         relation_columns = relation_token[1][0]
         relation_rows = relation_token[1][1:]
         relation_dict[relation_name] = Relation(relation_name, relation_columns, relation_rows)
-        # pprint(relation_dict[relation_name])
     return relation_dict
         
 def parse_numbers(tokens):
+    print('in parse numbers', tokens)
     try:
         tokens[0] = float(tokens[0])
     except:
         return
 
+# def parse_condition(tokens):
+#     print('in parse conditions', tokens)
+#     # if type(tokens[2])==float:
+#     #     tokens.insert(0, 'number')
+#     # elif type(tokens[2]) == str and tokens[2].startswith('\''):
+#     #     tokens[2].strip('\'')
+#     #     tokens.insert(0, 'string')
+#     # else:
+#     #     tokens.insert(0,'column')     
+#     # return tokens
