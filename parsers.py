@@ -105,14 +105,3 @@ def parse_numbers(tokens):
         tokens[0] = float(tokens[0])
     except:
         return
-
-# def parse_condition(tokens):
-#     print('in parse conditions', tokens)
-#     # if type(tokens[2])==float:
-#     #     tokens.insert(0, 'number')
-#     # elif type(tokens[2]) == str and tokens[2].startswith('\''):
-#     #     tokens[2].strip('\'')
-#     #     tokens.insert(0, 'string')
-#     # else:
-#     #     tokens.insert(0,'column')     
-#     # return tokens

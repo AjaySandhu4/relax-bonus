@@ -20,7 +20,7 @@ def main():
         'π name (Student)',
         '(takes) ⨝ cname=name (Course)',
         '(Student) ⨝ id=sid (takes)',
-        '(π name, title, mark ((Student) ⨝ id=sid (takes))) ⨝ sid=id (Course)',
+        '(π name, title, mark ((Student) ⨝ id=sid (takes))) ⨝ sid=name (Course)',
         '((Course) × (((takes) × (Student)) × (Student))) ⨝ sid=id (Course)',
         'Course',
         '(Course)',
@@ -37,10 +37,11 @@ def main():
         '(Student) ⨝ (CourseTwo)',
         '(Student) ⟗name=name (CourseTwo)',
         '(Student) ⟕name=name (CourseTwo)',
-        '(Course) ⟖name=name (π name, email (Student))'
+        '(Course) ⟖name=name (π name, email (Student))',
+        'σ name=\'John\' ((Student) ⟗name=name (CourseTwo))'
     ]
-    test = tests[len(tests)-1]
-    pprint(len(tests[len(tests)-1]))
+    test = tests[len(tests)-4]
+    # test = tests[10]
     pprint(test)
     query = parse_query(test)
     # print(relations_dict)

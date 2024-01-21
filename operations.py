@@ -32,9 +32,9 @@ def select(relation: Relation, condition: [str, str, str or int]) -> Relation:
                 comparison_column_index = relation_copy.columns.index(rhs_operand)
         new_rows = []
         for row in relation_copy.rows:
-            if compare_columns and comparator(row[column_index], row[comparison_column_index]):
+            if compare_columns and compare(row[column_index], row[comparison_column_index], comparator):
                 new_rows.append(row)
-            elif((not compare_columns) and comparator(row[column_index], rhs_operand)):
+            elif((not compare_columns) and compare(row[column_index], rhs_operand, comparator)):
                 new_rows.append(row)
         relation_copy.rows = new_rows
         return relation_copy
