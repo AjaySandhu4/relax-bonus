@@ -11,10 +11,14 @@ RELATION_FILE = 'relations.txt'
 
 def main():
     with open(RELATION_FILE) as relation_file:
-        raw_relations = relation_file.read()
-        relation_tokens = lexing_relations(raw_relations)
-        global relations_dict 
-        relations_dict = parse_relation_tokens(relation_tokens)
+        try:
+            raw_relations = relation_file.read()
+            relation_tokens = lexing_relations(raw_relations)
+            global relations_dict 
+            relations_dict = parse_relation_tokens(relation_tokens)
+        except:
+            print('Failed to parse relations')
+            exit()
     
     while(True):
         print('Enter a relational algebra query (or enter \'q\' to quit):')
