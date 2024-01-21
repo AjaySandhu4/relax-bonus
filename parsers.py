@@ -38,11 +38,11 @@ def parse_query(raw_query: str):
         )
         expr = Forward()
         relation_column = Word(alphas)
-        join_condition = Group(relation_column+oneOf("= > < <= >=")+relation_column)
+        join_condition = Group(relation_column+oneOf('= > < <= >=')+relation_column)
         project_condition = Group(OneOrMore(Word(alphas)+Optional(Suppress(','))))
         select_condition_rhs = Word(nums) | Combine(Word(nums) + '.' + Word(nums)) | Literal('\'').suppress() + Word(alphas) + Literal('\'').suppress()
         select_condition_rhs.setParseAction(parse_numbers)
-        select_condition = Group(Word(alphas)+oneOf("= > < <= >=")+select_condition_rhs)
+        select_condition = Group(Word(alphas)+oneOf('= > < <= >=')+select_condition_rhs)
 
         expr <<= (
             Group(project_op + project_condition + LPAR+expr+RPAR)
@@ -58,7 +58,7 @@ def parse_query(raw_query: str):
         parsedQuery = expr.parseString(raw_query).asList()
         return parsedQuery
     except:
-        print("Error in query parser")
+        print('Error in query parser')
         return None
 
 
@@ -84,7 +84,7 @@ def lexing_relations(raw_relations: str):
         relations = OneOrMore(Group(relation))
         return relations.parseString(raw_relations).asList()
     except:
-        print("Error in relation lexer")
+        print('Error in relation lexer')
         exit()
 
 def parse_relations(relation_tokens):

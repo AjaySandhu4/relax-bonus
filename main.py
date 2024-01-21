@@ -2,14 +2,15 @@ from copy import deepcopy
 from operations import RELATION_OPS_FUNCTIONS
 from parsers import *
 import sys
-from pprint import pprint
 
 sys.setrecursionlimit(3000)
 
 relations_dict = {}
 
+RELATION_FILE = 'relations.txt'
+
 def main():
-    with open('relations.txt') as relation_file:
+    with open(RELATION_FILE) as relation_file:
         raw_relations = relation_file.read()
         relation_tokens = lexing_relations(raw_relations)
         global relations_dict 
@@ -47,13 +48,13 @@ def perform(query):
                 relation = perform(query[2])
                 return RELATION_OPS_FUNCTIONS[op](relation, condition)
             else:
-                left_relation = perform(query[1]) #check query[1] or query[2] can possibly be relation?
+                left_relation = perform(query[1])
                 right_relation = perform(query[2])
                 return RELATION_OPS_FUNCTIONS[op](left_relation, right_relation)
         elif(len(query) == 4):
             op = query[0]
             condition = query[1]
-            left_relation = perform(query[2]) #check query[1] or query[2] can possibly be relation?
+            left_relation = perform(query[2])
             right_relation = perform(query[3])
             return RELATION_OPS_FUNCTIONS[op](left_relation, right_relation, condition)
         else:
@@ -62,5 +63,5 @@ def perform(query):
         print(e)
         print('Failed to perform query')
     
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()
