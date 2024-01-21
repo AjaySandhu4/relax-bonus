@@ -150,7 +150,6 @@ def natural_join(left_relation: Relation, right_relation: Relation) -> Relation:
                 common_column = left_column
         if common_column == None:
             return cross_product(left_relation, right_relation) # Return cross product if no common column between relations
-        print(common_column)
         joined_relations = inner_join(left_relation, right_relation, [common_column, '=', common_column])
         right_relation_columns = deepcopy(right_relation.columns)
         left_relation_columns = deepcopy(left_relation.columns)
