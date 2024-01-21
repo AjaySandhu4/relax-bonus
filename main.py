@@ -15,54 +15,29 @@ def main():
         global relations_dict 
         relations_dict = parse_relations(relation_tokens)
     
-    tests = [
-        '(Course) × (takes)',
-        'π name (Student)',
-        '(takes) ⨝ cname=name (Course)',
-        '(Student) ⨝ id=sid (takes)',
-        '(π name, title, mark ((Student) ⨝ id=sid (takes))) ⨝ sid=name (Course)',
-        '((Course) × (((takes) × (Student)) × (Student))) ⨝ sid=id (Course)',
-        'Course',
-        '(Course)',
-        '((Courses) × (takes))',
-        'σ name=\'John\' (Student)',
-        'σ id=2 (Student)',
-        'π id, email (Student)',
-        'π email (Student)',
-        'π name, id, email (Student)',
-        '(Course) ∩ (takes)',
-        '(takes) ∩ (takesTwo)',
-        '(takes) ∪ (takesTwo)',
-        '(takes) - (takesTwo)',
-        '(Student) ⨝ (CourseTwo)',
-        '(Student) ⟗name=name (CourseTwo)',
-        '(Student) ⟕name=name (CourseTwo)',
-        '(Course) ⟖name=name (π name, email (Student))',
-        'σ name=\'John\' ((Student) ⟗name=name (CourseTwo))'
-    ]
-    test = tests[len(tests)-4]
-    # test = tests[10]
-    pprint(test)
-    query = parse_query(test)
-    # print(relations_dict)
-    result = perform(query)
-    if(isinstance(result, Relation)):
-        result.print()
-
-    # pprint(query)
-
-    # perform()
-    # for test in tests:
-    #     print(test, '->', parse_query(test))
-    
+    while(True):
+        print('Enter a relational algebra query (or enter \'q\' to quit):')
+        raw_query = input()
+        if(raw_query == 'q'):
+            print('Bye!')
+            return
+        try:
+            query = parse_query(raw_query)
+            result = perform(query)
+            if(isinstance(result, Relation)):
+                print('\nHere is the result:')
+                result.print()
+            print()
+        except:
+            print('Query failed')
+            
 
 def perform(query):
-    # try:
+    try:
         if(type(query) == str):
             if query in relations_dict:
                 return deepcopy(relations_dict[query])
-            print('Failed to find relation', query)
-            exit()
+            raise Exception('Failed to find relation', query)
         elif(len(query) == 1):
             return perform(query[0])
         elif(len(query) == 3):
@@ -82,15 +57,10 @@ def perform(query):
             right_relation = perform(query[3])
             return RELATION_OPS_FUNCTIONS[op](left_relation, right_relation, condition)
         else:
-            return None
-    # except:
-    #     print('Failed to perform query')
-    #     return None
-
-
-
-
+            raise Exception('Too many arguments')
+    except Exception as e:
+        print(e)
+        print('Failed to perform query')
     
-
 if __name__ == "__main__":
     main()

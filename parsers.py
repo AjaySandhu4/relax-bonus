@@ -1,6 +1,5 @@
 from pyparsing import *
 from classes import *
-from pprint import pprint
 
 OPERATORS = {
     'select': 'σ',
@@ -43,7 +42,6 @@ def parse_query(raw_query: str):
         project_condition = Group(OneOrMore(Word(alphas)+Optional(Suppress(','))))
         select_condition_rhs = Word(nums) | Combine(Word(nums) + '.' + Word(nums)) | Literal('\'').suppress() + Word(alphas) + Literal('\'').suppress()
         select_condition_rhs.setParseAction(parse_numbers)
-        # select_condition_rhs.setParseAction(parse_condition)
         select_condition = Group(Word(alphas)+oneOf("= > < <= >=")+select_condition_rhs)
 
         expr <<= (
@@ -58,7 +56,6 @@ def parse_query(raw_query: str):
 
         expr.setParseAction(putOperatorFirst)
         parsedQuery = expr.parseString(raw_query).asList()
-        pprint(parsedQuery)
         return parsedQuery
     except:
         print("Error in query parser")
@@ -100,7 +97,6 @@ def parse_relations(relation_tokens):
     return relation_dict
         
 def parse_numbers(tokens):
-    # print('in parse numbers', tokens)
     try:
         tokens[0] = float(tokens[0])
     except:

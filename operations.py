@@ -40,7 +40,6 @@ def select(relation: Relation, condition: [str, str, str or int]) -> Relation:
         return relation_copy
     except:
         print('Failed to do selection operation')
-        exit()
 
 def project(relation: Relation, condition: list[str]) -> Relation:
     try:
@@ -66,7 +65,6 @@ def project(relation: Relation, condition: list[str]) -> Relation:
         return relation_copy
     except:
         print('Failed to do projects operation')
-        exit()
         
 def cross_product(left_relation: Relation, right_relation: Relation) -> Relation:
     try:
@@ -83,12 +81,10 @@ def cross_product(left_relation: Relation, right_relation: Relation) -> Relation
         return Relation(new_relation_name, new_columns, new_rows)
     except:
         print('Failed to do the cross product operation')
-        exit()
 
 def intersection(left_relation: Relation, right_relation: Relation) -> Relation:
     try:
         if(not relations_unifiable(left_relation, right_relation)):
-            print('Relations not unifiable')
             raise Exception('Relations not unifiable')
         left_relation_copy = deepcopy(left_relation)
         relation_name = left_relation_copy.name + right_relation.name
@@ -98,14 +94,13 @@ def intersection(left_relation: Relation, right_relation: Relation) -> Relation:
             if(row_in_relation(row, right_relation)):
                 new_rows.append(row)
         return Relation(relation_name, new_columns, new_rows)
-    except:
+    except Exception as e:
+        print(e)
         print('Failed to do intersection operation')
-        exit()
 
 def union(left_relation: Relation, right_relation: Relation) -> Relation:
     try:
         if(not relations_unifiable(left_relation, right_relation)):
-            print('Relations not unifiable')
             raise Exception('Relations not unifiable')
         left_relation_copy = deepcopy(left_relation)
         right_relation_copy = deepcopy(right_relation)
@@ -116,14 +111,13 @@ def union(left_relation: Relation, right_relation: Relation) -> Relation:
             if(not row_in_relation(row, left_relation_copy)):
                 new_rows.append(row)
         return Relation(relation_name, new_columns, new_rows)
-    except:
+    except Exception as e:
+        print(e)
         print('Failed to do union operation')
-        exit()
 
 def minus(left_relation: Relation, right_relation: Relation) -> Relation:
     try:
         if(not relations_unifiable(left_relation, right_relation)):
-            print('Relations not unifiable')
             raise Exception('Relations not unifiable')
         left_relation_copy = deepcopy(left_relation)
         relation_name = left_relation_copy.name + right_relation.name
@@ -133,24 +127,22 @@ def minus(left_relation: Relation, right_relation: Relation) -> Relation:
             if(not row_in_relation(row, right_relation)):
                 new_rows.append(row)
         return Relation(relation_name, new_columns, new_rows)
-    except:
+    except Exception as e:
+        print(e)
         print('Failed to do minus operation')
-        exit()
 
 def inner_join(left_relation: Relation, right_relation: Relation, condition: list = None) -> Relation:
-    if(condition == None):
-        return natural_join(left_relation, right_relation)
-    else:
-        relation_cross_product = cross_product(left_relation, right_relation)
-        # print('relation after cross product:')
-        # relation_cross_product.print()
-        selected_cross_product = select(relation_cross_product, condition)
-        # print('relation after select with condition', condition)
-        # selected_cross_product.print()
-        return selected_cross_product
+    try:
+        if(condition == None):
+            return natural_join(left_relation, right_relation)
+        else:
+            relation_cross_product = cross_product(left_relation, right_relation)
+            selected_cross_product = select(relation_cross_product, condition)
+            return selected_cross_product
+    except:
+        print('Failed to do inner join operation')
 
 def natural_join(left_relation: Relation, right_relation: Relation) -> Relation:
-    print("In natural join")
     try:
         common_column = None
         for left_column in left_relation.columns:
@@ -167,26 +159,31 @@ def natural_join(left_relation: Relation, right_relation: Relation) -> Relation:
         return joined_relations_with_no_duplicate_columns
     except:
         print('Failed to do the natural join operation')
-        exit()
 
 def left_outer_join(left_relation: Relation, right_relation: Relation, condition: list) -> Relation:
-    print('in left outer join')
-    inner_joined_relation = inner_join(left_relation, right_relation, condition)
-    inner_joined_relation.rows += unmatching_left_relation_rows(left_relation,right_relation,condition)
-    return inner_joined_relation
+    try:
+        inner_joined_relation = inner_join(left_relation, right_relation, condition)
+        inner_joined_relation.rows += unmatching_left_relation_rows(left_relation,right_relation,condition)
+        return inner_joined_relation
+    except:
+        print('Failed to do left outer join operation')
     
 def right_outer_join(left_relation: Relation, right_relation: Relation, condition: list) -> Relation:
-    print('in right outer join')
-    inner_joined_relation = inner_join(left_relation, right_relation, condition)
-    inner_joined_relation.rows += unmatching_right_relation_rows(left_relation,right_relation,condition)
-    return inner_joined_relation
+    try:
+        inner_joined_relation = inner_join(left_relation, right_relation, condition)
+        inner_joined_relation.rows += unmatching_right_relation_rows(left_relation,right_relation,condition)
+        return inner_joined_relation
+    except:
+        print('Failed to do right outer join operation')
 
 def full_outer_join(left_relation: Relation, right_relation: Relation, condition: list) -> Relation:
-    print('in full outer join')
-    inner_joined_relation = inner_join(left_relation, right_relation, condition)
-    inner_joined_relation.rows += unmatching_left_relation_rows(left_relation,right_relation,condition)
-    inner_joined_relation.rows += unmatching_right_relation_rows(left_relation,right_relation,condition)
-    return inner_joined_relation
+    try:
+        inner_joined_relation = inner_join(left_relation, right_relation, condition)
+        inner_joined_relation.rows += unmatching_left_relation_rows(left_relation,right_relation,condition)
+        inner_joined_relation.rows += unmatching_right_relation_rows(left_relation,right_relation,condition)
+        return inner_joined_relation
+    except:
+        print('Failed to do full outer join operation')
 
 def relations_unifiable(left_relation: Relation, right_relation: Relation) -> bool:
     if(len(left_relation.columns) != len(left_relation.columns)):

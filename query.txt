@@ -1,3 +1,29 @@
 (Student) ⨝ id=sid (takes)
 
 (π name, title, mark ((Student ⨝ Student.id=Takes.sid takes)) ⨝ cid=Course.id Course)
+
+tests = [
+        '(Course) × (takes)',
+        'π name (Student)',
+        '(takes) ⨝ cname=name (Course)',
+        '(Student) ⨝ id=sid (takes)',
+        '(π name ((Student) ⨝ id=sid (takes))) ⨝ sid=name (Course)',
+        '((Course) × (((takes) × (Student)) × (Student))) ⨝ sid=id (Course)',
+        'Course',
+        '(Course)',
+        '((Courses) × (takes))',
+        'σ name='John' (Student)',
+        'σ id=2 (Student)',
+        'π id, email (Student)',
+        'π email (Student)',
+        'π name, id, email (Student)',
+        '(Course) ∩ (takes)',
+        '(takes) ∩ (takesTwo)',
+        '(takes) ∪ (takesTwo)',
+        '(takes) - (takesTwo)',
+        '(Student) ⨝ (CourseTwo)',
+        '(Student) ⟗name=name (CourseTwo)',
+        '(Student) ⟕name=name (CourseTwo)',
+        '(Course) ⟖name=name (π name, email (Student))',
+        'σ name='John' ((Student) ⟗ name=name (CourseTwo))'
+    ]
