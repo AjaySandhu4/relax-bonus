@@ -1,10 +1,23 @@
 from pyparsing import *
-from globals import *
 from classes import *
 from pprint import pprint
 
+OPERATORS = {
+    'select': 'σ',
+    'project': 'π',
+    'inner_join': '⨝',
+    'left_outer_join': '⟕',
+    'right_outer_join': '⟖',
+    'full_outer_join': '⟗',
+    'cross_product': '×',
+    'intersection': '∩',
+    'union': '∪',
+    'minus': '-'
+}
+UNARY_OPERATORS = OPERATORS['select']+OPERATORS['project']
+
 def parse_query(raw_query: str):
-    # try:
+    try:
         bin_op = (
             Literal(OPERATORS['select']) 
             | Literal(OPERATORS['cross_product']) 
@@ -47,9 +60,9 @@ def parse_query(raw_query: str):
         parsedQuery = expr.parseString(raw_query).asList()
         pprint(parsedQuery)
         return parsedQuery
-    # except:
-    #     print("Error in query lexer")
-    #     return None
+    except:
+        print("Error in query parser")
+        return None
 
 
 
@@ -87,7 +100,7 @@ def parse_relations(relation_tokens):
     return relation_dict
         
 def parse_numbers(tokens):
-    print('in parse numbers', tokens)
+    # print('in parse numbers', tokens)
     try:
         tokens[0] = float(tokens[0])
     except:

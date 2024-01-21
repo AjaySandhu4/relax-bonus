@@ -1,5 +1,5 @@
 from copy import deepcopy
-from globals import *
+from operations import RELATION_OPS_FUNCTIONS
 from parsers import *
 import sys
 from pprint import pprint
@@ -12,11 +12,8 @@ def main():
     with open('relations.txt') as relation_file:
         raw_relations = relation_file.read()
         relation_tokens = lexing_relations(raw_relations)
-        # pprint(relation_tokens)
         global relations_dict 
         relations_dict = parse_relations(relation_tokens)
-        # pprint(relations_dict['Student'].name)
-    # pprint(relations_dict)
     
     tests = [
         '(Course) × (takes)',
@@ -25,8 +22,8 @@ def main():
         '(Student) ⨝ id=sid (takes)',
         '(π name, title, mark ((Student) ⨝ id=sid (takes))) ⨝ sid=id (Course)',
         '((Course) × (((takes) × (Student)) × (Student))) ⨝ sid=id (Course)',
-        'Courses',
-        '(Courses)',
+        'Course',
+        '(Course)',
         '((Courses) × (takes))',
         'σ name=\'John\' (Student)',
         'σ id=2 (Student)',
@@ -37,13 +34,16 @@ def main():
         '(takes) ∩ (takesTwo)',
         '(takes) ∪ (takesTwo)',
         '(takes) - (takesTwo)',
-        '(Student) ⨝ (CourseTwo)'
+        '(Student) ⨝ (CourseTwo)',
+        '(Student) ⟗name=name (CourseTwo)',
+        '(Student) ⟕name=name (CourseTwo)',
+        '(Course) ⟖name=name (π name, email (Student))'
     ]
     test = tests[len(tests)-1]
     pprint(len(tests[len(tests)-1]))
     pprint(test)
     query = parse_query(test)
-    print(relations_dict)
+    # print(relations_dict)
     result = perform(query)
     if(isinstance(result, Relation)):
         result.print()

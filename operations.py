@@ -1,6 +1,5 @@
 from classes import *
 from copy import deepcopy
-from globals import *
 import operator
 
 COMPARISON_OPS = {
@@ -11,6 +10,8 @@ COMPARISON_OPS = {
     '<': operator.lt,
     '>': operator.gt,
 }
+
+NULL = 'NULL'
 
 def select(relation: Relation, condition: [str, str, str or int]) -> Relation:
     try:
@@ -142,10 +143,10 @@ def inner_join(left_relation: Relation, right_relation: Relation, condition: lis
     else:
         relation_cross_product = cross_product(left_relation, right_relation)
         # print('relation after cross product:')
-        relation_cross_product.print()
+        # relation_cross_product.print()
         selected_cross_product = select(relation_cross_product, condition)
         # print('relation after select with condition', condition)
-        selected_cross_product.print()
+        # selected_cross_product.print()
         return selected_cross_product
 
 def natural_join(left_relation: Relation, right_relation: Relation) -> Relation:
@@ -213,22 +214,58 @@ def row_in_relation(row: list, relation: Relation):
     return False
 
 def compare(left, right, comparator):
-    if left == None or right == None:
+    if left == NULL or right == NULL: # Always return false if either operand is NULL
         return False
     return comparator(left,right)
 
 def unmatching_left_relation_rows(left_relation: Relation, right_relation: Relation, condition: list) -> list:
-    filter_by = condition[0]
+    lhs_operand = condition[0]
     comparator = COMPARISON_OPS[condition[1]]
     rhs_operand = condition[2]
-    left_relation_copy = deepcopy(left_relation)
-    for row in left_relation_copy.rows:
-        print("Yeah")
-    return []
+    left_relation_copy_rows = deepcopy(left_relation.rows)
+    left_column_condition_index = left_relation.columns.index(lhs_operand)
+    right_column_condition_index = right_relation.columns.index(rhs_operand)
+    new_left_rows = []
+    for left_row in left_relation_copy_rows:
+        found_match = False
+        for right_row in right_relation.rows:
+            if compare(left_row[left_column_condition_index] , right_row[right_column_condition_index], comparator):
+                found_match = True
+        if found_match == False:
+            left_row += [NULL]*(len(right_relation.columns)) # Fill rest of row with None
+            new_left_rows.append(left_row)
+    return new_left_rows
 
 def unmatching_right_relation_rows(left_relation: Relation, right_relation: Relation, condition: list) -> list:
-    return []
+    lhs_operand = condition[0]
+    comparator = COMPARISON_OPS[condition[1]]
+    rhs_operand = condition[2]
+    right_relation_copy_rows = deepcopy(right_relation.rows)
+    left_column_condition_index = left_relation.columns.index(lhs_operand)
+    right_column_condition_index = right_relation.columns.index(rhs_operand)
+    new_right_rows = []
+    for right_row in right_relation_copy_rows:
+        found_match = False
+        for left_row in left_relation.rows:
+            if compare(left_row[left_column_condition_index] , right_row[right_column_condition_index], comparator):
+                found_match = True
+        if found_match == False:
+            right_row = [NULL]*(len(left_relation.columns)) + right_row # Fill rest of row with None
+            new_right_rows.append(right_row)
+    return new_right_rows
 
+RELATION_OPS_FUNCTIONS = {
+    'σ': select,
+    'π': project,
+    '⨝': inner_join,
+    '⟕': left_outer_join,
+    '⟖': right_outer_join,
+    '⟗': full_outer_join,
+    '×': cross_product,
+    '∩': intersection,
+    '∪': union,
+    '-': minus
+}
 
 
 
